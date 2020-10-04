@@ -1,29 +1,23 @@
 package edu.neu.coe.info6205.union_find;
 
+import java.util.Random;
+
 public class UFexperiment {
     public static int count(int n){
         int connections =0;
         UF h = new UF_HWQUPC(n);
-
-        for (int i = 0; i < n; i++) {
-            if(h.components()==1){
-                break;
+        Random ran = new Random();
+        while(h.components()!=1){
+            int random1 = ran.nextInt(n);
+            int random2 = ran.nextInt(n);
+            if(h.isConnected(random1,random2)){}
+            else{
+                h.connect(random1,random2);
+                connections++;
             }
-            for (int j = i+1; j <n; j++) {
-                if(h.components()==1){
-                    break;
-                }
-                if(h.isConnected(i,j)){}
-                    else{
-                        h.connect(i,j);
-                        connections++;
-                }
-
-
-
-            }
-
         }
+
+
         return connections;
 
     }
