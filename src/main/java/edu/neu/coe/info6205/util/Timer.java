@@ -39,6 +39,7 @@ public class Timer {
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function) {
+
         return repeat(n, supplier, function, null, null);
     }
 
@@ -55,6 +56,51 @@ public class Timer {
     public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
         logger.trace("repeat: with " + n + " runs");
         // TO BE IMPLEMENTED: note that the timer is running when this method is called and should still be running when it returns.
+        if (preFunction==null){
+            if (postFunction==null){
+                for (int i = 0; i < n; i++) {
+                    function.apply(supplier.get());
+                    lap();
+                }
+                pause();
+                return meanLapTime();
+            }else{
+                for (int i = 0; i < n; i++) {
+                    U u = function.apply(supplier.get());
+                    pause();
+                    postFunction.accept(u);
+                    resume();
+                    lap();
+                }
+                pause();
+                return meanLapTime();
+            }
+        }else if (postFunction==null){
+            for (int i = 0; i < n; i++) {
+                pause();
+                T t = preFunction.apply(supplier.get());
+                resume();
+                function.apply(t);
+
+                lap();
+            }
+            pause();
+            return meanLapTime();
+        }else{
+            for (int i = 0; i < n; i++) {
+                pause();
+                T t = preFunction.apply(supplier.get());
+                resume();
+                U u = function.apply(t);
+                pause();
+                postFunction.accept(u);
+                resume();
+                lap();
+            }
+            pause();
+            return meanLapTime();
+        }
+
     }
 
     /**
@@ -173,6 +219,8 @@ public class Timer {
      */
     private static long getClock() {
         // TO BE IMPLEMENTED
+        long time = System.nanoTime();
+        return time;
     }
 
     /**
@@ -184,6 +232,9 @@ public class Timer {
      */
     private static double toMillisecs(long ticks) {
         // TO BE IMPLEMENTED
+
+        double ts = (double)ticks;
+        return ts/1000000;
     }
 
     final static LazyLogger logger = new LazyLogger(Timer.class);

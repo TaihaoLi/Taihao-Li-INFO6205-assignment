@@ -35,10 +35,13 @@ public class UF_HWQUPC implements UF {
     public UF_HWQUPC(int n, boolean pathCompression) {
         count = n;
         parent = new int[n];
-        height = new int[n];
+        depth = new int[n];
+        size = new int[n];
         for (int i = 0; i < n; i++) {
             parent[i] = i;
-            height[i] = 1;
+            depth[i] = 1;
+            size[i] = 1;
+
         }
         this.pathCompression = pathCompression;
     }
@@ -58,7 +61,7 @@ public class UF_HWQUPC implements UF {
 
     public void show() {
         for (int i = 0; i < parent.length; i++) {
-            System.out.printf("%d: %d, %d\n", i, parent[i], height[i]);
+            System.out.printf("%d: %d, %d\n", i, parent[i], depth[i]);
         }
     }
 
@@ -80,16 +83,18 @@ public class UF_HWQUPC implements UF {
      */
     public int find(int p) {
         validate(p);
+        if (pathCompression){
+            doPathCompression(p);
+        }
         int root = p;
         // TO BE IMPLEMENTED
 
         while(root!=parent[root]){
             root= parent[root];
 
+
         }
-        if (pathCompression){
-            doPathCompression(p);
-        }
+
 
 
         return root;
@@ -143,7 +148,7 @@ public class UF_HWQUPC implements UF {
         return "UF_HWQUPC:" + "\n  count: " + count +
                 "\n  path compression? " + pathCompression +
                 "\n  parents: " + Arrays.toString(parent) +
-                "\n  heights: " + Arrays.toString(height);
+                "\n  depths: " + Arrays.toString(depth);
     }
 
     // validate that p is a valid index
@@ -159,7 +164,7 @@ public class UF_HWQUPC implements UF {
     }
 
     private void updateHeight(int p, int x) {
-        height[p] += height[x];
+        depth[p] += depth[x];
     }
 
     /**
@@ -172,30 +177,35 @@ public class UF_HWQUPC implements UF {
         return parent[i];
     }
 
-    private final int[] parent;   // parent[i] = parent of i
-    private final int[] height;   // height[i] = height of subtree rooted at i
+    private  final int[] parent;   // parent[i] = parent of i
+    private  final int[] depth;   // height[i] = height of subtree rooted at i
+    private final  int[] size;   // size[i] = size of subtree rooted at i
     private int count;  // number of components
     private boolean pathCompression;
 
     private void mergeComponents(int i, int j) {
         // TO BE IMPLEMENTED make shorter root point to taller one
-        if(i>j){
-
-            updateParent(i,j);
-
-            if(height[i]>=height[j]){
-                updateHeight(j,i);
-            }
 
 
-        }else{
-            updateParent(j,i);
-            if(height[j]>=height[i]){
-                updateHeight(i,j);
-            }
 
+        int rooti = i;
+        int rootj = j;
+        if (i == j) return;
+        // make smaller root point to larger one
+        if (size[rooti] < size[rootj]) {
+
+            updateParent(rooti, rootj);
+            size[rootj] += size[rooti];
+
+        } else {
+
+            updateParent(rootj, rooti);
+            size[rooti] += size[rootj];
 
         }
+
+
+
     }
 
     /**
@@ -203,8 +213,25 @@ public class UF_HWQUPC implements UF {
      */
     private void doPathCompression(int i) {
         // TO BE IMPLEMENTED update parent to value of grandparent
-        int temp= parent[i];
-        parent[i] =parent[temp];
+            while(i!=parent[i]) {
+
+                parent[i] = parent[parent[i]];
+                i=parent[i];
+            }
+
+    }
+    public double countdepth(){
+        double averagedepth=0;
+        for (int k = 0; k < parent.length; k++) {
+            int root = k;
+
+            while(root!=parent[root]){
+                root= parent[root];
+                depth[k]++;
+        }
+            averagedepth+= depth[k];
+        }
+        return averagedepth/parent.length;
 
     }
 }

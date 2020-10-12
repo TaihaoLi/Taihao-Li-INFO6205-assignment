@@ -1,15 +1,9 @@
-/*
- * Copyright (c) 2017. Phasmid Software
- */
 package edu.neu.coe.info6205.union_find;
 
-/**
- * Weighted Quick Union with Path Compression
- */
-public class WQUPC {
+public class WQUPC_grandparent {
     private final int[] parent;   // parent[i] = parent of i
     private final int[] size;   // size[i] = size of subtree rooted at i
-    private final int[] depth;  // depth[i] = depth of subtree rooted at i
+    private final int[] depth;
     private int count;  // number of components
 
     /**
@@ -20,7 +14,7 @@ public class WQUPC {
      * @param n the number of sites
      * @throws IllegalArgumentException if {@code n < 0}
      */
-    public WQUPC(int n) {
+    public WQUPC_grandparent(int n) {
         count = n;
         parent = new int[n];
         size = new int[n];
@@ -56,16 +50,12 @@ public class WQUPC {
      */
     public int find(int p) {
         validate(p);
-        int root = p;
-        while (root != parent[root]) {
-            root = parent[root];
+       while(p!=parent[p]){
+           parent[p]=parent[parent[p]];
+           p=parent[p];
+
         }
-        while (p != root) {
-            int newp = parent[p];
-            parent[p] = root;
-            p = newp;
-        }
-        return root;
+        return p;
     }
 
     // validate that p is a valid index
@@ -127,6 +117,4 @@ public class WQUPC {
         return averagedepth/parent.length;
 
     }
-
-
 }

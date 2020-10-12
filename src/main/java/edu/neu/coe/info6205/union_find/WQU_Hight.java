@@ -1,15 +1,9 @@
-/*
- * Copyright (c) 2017. Phasmid Software
- */
 package edu.neu.coe.info6205.union_find;
 
-/**
- * Weighted Quick Union with Path Compression
- */
-public class WQUPC {
+public class WQU_Hight {
     private final int[] parent;   // parent[i] = parent of i
-    private final int[] size;   // size[i] = size of subtree rooted at i
-    private final int[] depth;  // depth[i] = depth of subtree rooted at i
+    private final int[] Height;   // size[i] = size of subtree rooted at i
+    private final int[] depth;
     private int count;  // number of components
 
     /**
@@ -20,21 +14,21 @@ public class WQUPC {
      * @param n the number of sites
      * @throws IllegalArgumentException if {@code n < 0}
      */
-    public WQUPC(int n) {
+    public WQU_Hight(int n) {
         count = n;
         parent = new int[n];
-        size = new int[n];
+        Height = new int[n];
         depth = new int[n];
         for (int i = 0; i < n; i++) {
             parent[i] = i;
-            size[i] = 1;
+            Height[i] = 1;
             depth[i] = 1;
         }
     }
 
     public void show() {
         for (int i = 0; i < parent.length; i++) {
-            System.out.printf("%d: %d, %d\n", i, parent[i], size[i]);
+            System.out.printf("%d: %d, %d\n", i, parent[i], Height[i]);
         }
     }
 
@@ -60,11 +54,7 @@ public class WQUPC {
         while (root != parent[root]) {
             root = parent[root];
         }
-        while (p != root) {
-            int newp = parent[p];
-            parent[p] = root;
-            p = newp;
-        }
+
         return root;
     }
 
@@ -104,12 +94,15 @@ public class WQUPC {
         int rootQ = find(q);
         if (rootP == rootQ) return;
         // make smaller root point to larger one
-        if (size[rootP] < size[rootQ]) {
+        if (Height[rootP] < Height[rootQ]) {
             parent[rootP] = rootQ;
-            size[rootQ] += size[rootP];
-        } else {
+
+        } else if(Height[rootP] >Height[rootQ]){
             parent[rootQ] = rootP;
-            size[rootP] += size[rootQ];
+
+        }else{
+            parent[rootP] = rootQ;
+            Height[rootQ] =Height[rootP]+1;
         }
         count--;
     }

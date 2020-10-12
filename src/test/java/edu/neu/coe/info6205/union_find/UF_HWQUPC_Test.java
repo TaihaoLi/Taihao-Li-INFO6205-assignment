@@ -40,8 +40,8 @@ public class UF_HWQUPC_Test {
     }
 
     /**
-     *
-     */
+     **/
+
     @Test
     public void testIsConnected03() {
         Connections h = new UF_HWQUPC(2);
@@ -49,6 +49,7 @@ public class UF_HWQUPC_Test {
         assertNull(tester.invokePrivate("updateParent", 0, 1));
         assertTrue(h.isConnected(0, 1));
     }
+
 
     /**
      *
