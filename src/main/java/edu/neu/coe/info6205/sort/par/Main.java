@@ -18,12 +18,33 @@ public class Main {
 
     public static void main(String[] args) {
         processArgs(args);
-        System.out.println("Degree of parallelism: " + ForkJoinPool.getCommonPoolParallelism());
+
+
         Random random = new Random();
-        int[] array = new int[2000000];
+        int[] array = new int[10000000];
+        //warm uo array
+        int[] array2 = new int[2000000];
         ArrayList<Long> timeList = new ArrayList<>();
-        for (int j = 50; j < 100; j++) {
-            ParSort.cutoff = 10000 * (j + 1);
+        for (int  p= 1; p <=64; p=p*2) {
+            //set number of thread
+            ParSort.threadCount=p;
+            ParSort.myPool=new ForkJoinPool(ParSort.threadCount);
+            ParSort.cutoff= array2.length;
+            //warm up
+            for (int t1 = 0; t1 < 10; t1++) {
+
+                for (int i1 = 0; i1 < array2.length; i1++) array2[i1] = random.nextInt(10000000);
+                ParSort.sort(array2, 0, array2.length);
+            }
+
+            //get the Degree of parallelism from ParSort.threadCount
+        System.out.println("Degree of parallelism: " + ParSort.myPool.getParallelism());
+        System.out.println("Length of Array(N): " + array.length);
+            for (int j = 1; j <=500; j=j*2) {
+                ParSort.cutoff = array.length/j;
+
+            //for (int j = 50; j < 100; j++) {
+            //ParSort.cutoff = 1000 * (j + 1);
             // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
             long time;
             long startTime = System.currentTimeMillis();
@@ -36,9 +57,11 @@ public class Main {
             timeList.add(time);
 
 
-            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times Time:" + time + "ms");
+            System.out.println("cutoff：" + (ParSort.cutoff) +"\tmeans:N/"+j+"\t\t10times Time:" + time + "ms");
 
-        }
+
+            }
+    }
         try {
             FileOutputStream fis = new FileOutputStream("./src/result.csv");
             OutputStreamWriter isr = new OutputStreamWriter(fis);
